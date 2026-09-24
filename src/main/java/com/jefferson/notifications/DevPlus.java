@@ -12,7 +12,7 @@ public class DevPlus {
     private ServicioAdicional[] listServicioAdicional;
     private Cliente[] listCliente;
 
-    public DevPlus(String nombre, String nit, String direccion, String telefono, String paginaWeb, Proyecto[] listProyecto, Desarrollador[] listDesarrollador, ServicioAdicional[] listServicioAdicional, Cliente[] listCliente) {
+    public DevPlus(String nombre, String nit, String direccion, String telefono, String paginaWeb) {
         this.nombre = nombre;
         this.nit = nit;
         this.direccion = direccion;
@@ -23,6 +23,7 @@ public class DevPlus {
         this.listServicioAdicional = new ServicioAdicional[10];
         this.listCliente = new Cliente[10];
     }
+
 
     public String getNombre() {
         return nombre;
