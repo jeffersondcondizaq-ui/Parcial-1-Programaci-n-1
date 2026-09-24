@@ -26,7 +26,6 @@ public class DevPlusMain {
                     "\n 2. Gestionar Desarrolladores" +
                     "\n 3. Gestionar Proyectos" +
                     "\n 4. Gestionar Servicios Adicional" +
-                    "\n 4. Calcular Ingresos" +
                     "\n 0. Salir del sistema"));
 
             switch (option) {
@@ -44,22 +43,22 @@ public class DevPlusMain {
                                 "\n 0. Regresar"));
                         switch (clienteOption) {
                             case 1:
-                                JOptionPane.showMessageDialog(null, "Registrando cliente...");
+                                registrarCliente();
                                 break;
                             case 2:
-                                JOptionPane.showMessageDialog(null, "Mostrando clientes...");
+                                mostrarListaClientes();
                                 break;
                             case 3:
-                                JOptionPane.showMessageDialog(null, "Mostrando cliente...");
+                                buscarClientePorId();
                                 break;
                             case 4:
-                                JOptionPane.showMessageDialog(null, "Actualizando cliente...");
+                                actualizarCliente();
                                 break;
                             case 5:
-                                JOptionPane.showMessageDialog(null, "Eliminando cliente...");
+                                eliminarClientePorTelefono();
                                 break;
                             case 6:
-                                JOptionPane.showMessageDialog(null, "Actualizando cliente...");
+                                buscarClientePorTelefono();
                                 break;
                             case 0:
                                 break;
@@ -81,19 +80,19 @@ public class DevPlusMain {
                                 "\n 0. Regresar"));
                         switch (desarroladorOption) {
                             case 1:
-                                JOptionPane.showMessageDialog(null, "Registrando Desarrollador...");
+                                registrarDesarrollador();
                                 break;
                             case 2:
-                                JOptionPane.showMessageDialog(null, "Mostrando Desarrolladores...");
+                                mostrarListaDesarrolladores();
                                 break;
                             case 3:
-                                JOptionPane.showMessageDialog(null, "Mostrtando Desarrollador...");
+                                buscarDesarrolladorPorCodigo();
                                 break;
                             case 4:
-                                JOptionPane.showMessageDialog(null, "Actualizando Desarrollador...");
+                                actualizarDesarrollador();
                                 break;
                             case 5:
-                                JOptionPane.showMessageDialog(null, "Eliminando Desarrollador...");
+                                eliminarDesarrollador();
                                 break;
                             case 0:
                                 break;
@@ -112,42 +111,22 @@ public class DevPlusMain {
                                 "\n 4. Mostrar Proyecto por Codigo" +
                                 "\n 5. Actualizar Proyecto" +
                                 "\n 5. Eliminar Proyecto" +
-                                "\n 6. Cambiar estado de un proyecto" +
-                                "\n 7. Verificar Disponibilidad de Desarrolladores" +
-                                "\n 8. Agregar Desarollador a un Proyecto" +
-                                "\n 9. Agregar Servicio Adicional" +
-                                "\n 10. Calcular Valor de un Proyecto" +
                                 "\n 0. Regresar"));
                         switch (proyectoOption) {
                             case 1:
-                                JOptionPane.showMessageDialog(null, "Registrando Proyecto...");
+                                registrarProyecto();
                                 break;
                             case 2:
-                                JOptionPane.showMessageDialog(null, "Mostrando Proyectos...");
+                                mostrarListaProyectos();
                                 break;
                             case 3:
-                                JOptionPane.showMessageDialog(null, "Mostrtando Proyecto...");
+                                buscarProyectoPorCodigo();
                                 break;
                             case 4:
-                                JOptionPane.showMessageDialog(null, "Actualizando Proyecto...");
+                                actualizarProyecto();
                                 break;
                             case 5:
-                                JOptionPane.showMessageDialog(null, "Eliminando Proyecto...");
-                                break;
-                            case 6:
-                                JOptionPane.showMessageDialog(null, "Cambiando Estado...");
-                                break;
-                            case 7:
-                                JOptionPane.showMessageDialog(null, "Verificando Disoponibiidad...");
-                                break;
-                            case 8:
-                                JOptionPane.showMessageDialog(null, "Agregando Desarollador...");
-                                break;
-                            case 9:
-                                JOptionPane.showMessageDialog(null, "Agregando Servicio Adicional...");
-                                break;
-                            case 10:
-                                JOptionPane.showMessageDialog(null, "Calculando Valor...");
+                                eliminarProyecto();
                                 break;
                             case 0:
                                 break;
@@ -159,7 +138,7 @@ public class DevPlusMain {
                 case 4:
                     int servicioAdiOption = 0;
                     do {
-                        servicioAdiOption = Integer.parseInt(JOptionPane.showInputDialog("~~ GESTIONAR DESARROLLADORES ~~\n"+
+                        servicioAdiOption = Integer.parseInt(JOptionPane.showInputDialog("~~ GESTIONAR SERVICIOS ADICIONALES ~~\n"+
                                 "Seleccione una opcion\n" +
                                 "\n 1. Registrar Servicio Adicional" +
                                 "\n 2. Mostrar Servicios Adicionales" +
@@ -169,19 +148,19 @@ public class DevPlusMain {
                                 "\n 0. Regresar"));
                         switch (servicioAdiOption) {
                             case 1:
-                                JOptionPane.showMessageDialog(null, "Registrando Servicio Adicional...");
+                                registrarServicioAdicional();
                                 break;
                             case 2:
-                                JOptionPane.showMessageDialog(null, "Mostrando Servicios Adicionales...");
+                                mostrarListaServiciosAdicionales();
                                 break;
                             case 3:
-                                JOptionPane.showMessageDialog(null, "Mostrtando Servicio Adicional...");
+                                buscarServicioAdicionalPorCodigo();
                                 break;
                             case 4:
-                                JOptionPane.showMessageDialog(null, "Actualizando Servicio Adicional...");
+                                actualizarServicioAdicional();
                                 break;
                             case 5:
-                                JOptionPane.showMessageDialog(null, "Eliminando Servicio Adicional...");
+                                eliminarServicioAdicional();
                                 break;
                             case 0:
                                 break;
@@ -213,5 +192,265 @@ public class DevPlusMain {
         JOptionPane.showMessageDialog(null,mensaje);
     }
 
+
+    // ----------------- gestion de clientes -----------------
+
+    //Registrar la informacion del cliente
+    private static void registrarCliente() {
+        String identificacion = pedirDatos("Ingrese la identificación del cliente:");
+        String nombre = pedirDatos("Ingrese el nombre del cliente:");
+        String telefono = pedirDatos("Ingrese el teléfono del cliente:");
+        String correoElectronico = pedirDatos("Ingrese el correo electrónico del cliente:");
+        String paisProcedencia = pedirDatos("Ingrese el país de procedencia del cliente:");
+        boolean esFrecuente = pedirDatos("¿Es un cliente frecuente? (S/N):").equalsIgnoreCase("S");
+
+        boolean resultado = devPlus.registrarCliente(identificacion, nombre, telefono, correoElectronico, paisProcedencia, esFrecuente);
+
+        if (resultado) {
+            mostrarMensaje("Cliente registrado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo registrar el cliente. Verifique que la identificación no esté repetida.");
+        }
+    }
+
+    //Mostrar la lista completa de clientes
+    private static void mostrarListaClientes() {
+        mostrarMensaje(devPlus.mostrarListaClientes());
+    }
+
+    //Buscar un cliente por telefono
+    private static void buscarClientePorTelefono() {
+        String telefono = pedirDatos("Ingrese el teléfono del cliente a buscar:");
+
+        mostrarMensaje(devPlus.buscarClientePorTelefono(telefono));
+    }
+
+    //Mostrar un cliente por identificacion
+    private static void buscarClientePorId() {
+        String identificacion = pedirDatos("Ingrese la identificación del cliente a buscar:");
+
+        mostrarMensaje(devPlus.mostrarCliente(identificacion));
+    }
+
+    //Actualizar la informacion del cliente
+    private static void actualizarCliente() {
+        String identificacion = pedirDatos("Ingrese la identificación del cliente a actualizar:");
+        String nombre = pedirDatos("Ingrese el nuevo nombre del cliente:");
+        String telefono = pedirDatos("Ingrese el nuevo teléfono del cliente:");
+        String correoElectronico = pedirDatos("Ingrese el nuevo correo electrónico del cliente:");
+        String paisProcedencia = pedirDatos("Ingrese el nuevo país de procedencia del cliente:");
+        boolean esFrecuente = pedirDatos("¿Es un cliente frecuente? (S/N):").equalsIgnoreCase("S");
+
+        boolean resultado = devPlus.actualizarCliente(identificacion, nombre, telefono, correoElectronico, paisProcedencia, esFrecuente);
+
+        if (resultado) {
+            mostrarMensaje("Cliente actualizado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo actualizar el cliente.");
+        }
+    }
+
+    //Eliminar un cliente por telefono
+    private static void eliminarClientePorTelefono() {
+        String telefono = pedirDatos("Ingrese el teléfono del cliente a eliminar:");
+
+        boolean resultado = devPlus.eliminarClientePorTelefono(telefono);
+
+        if (resultado) {
+            mostrarMensaje("Cliente eliminado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo eliminar el cliente.");
+        }
+    }
+
+    // ----------------- gestion de desarrolladores -----------------
+
+    //Registrar la informacion del desarrollador
+    private static void registrarDesarrollador() {
+        String codigo = pedirDatos("Ingrese el código del desarrollador:");
+        String equipoTrabajo = pedirDatos("Ingrese el equipo de trabajo del desarrollador:");
+        String nivel = pedirDatos("Ingrese el nivel del desarrollador (Junior, Semisenior, Senior):");
+        int maxProyectosSimultaneos = Integer.parseInt(pedirDatos("Ingrese la cantidad máxima de proyectos simultáneos:"));
+        double tarifaDia = Double.parseDouble(pedirDatos("Ingrese la tarifa por día del desarrollador:"));
+        String estado = pedirDatos("Ingrese el estado del desarrollador (Disponible, Asignado, Ocupado, En capacitación):");
+
+        boolean resultado = devPlus.registrarDesarrollador(codigo, equipoTrabajo, nivel, maxProyectosSimultaneos, tarifaDia, estado);
+
+        if (resultado) {
+            mostrarMensaje("Desarrollador registrado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo registrar el desarrollador. Verifique que el código no esté repetido.");
+        }
+    }
+
+    //Mostrar la lista completa de desarrolladores
+    private static void mostrarListaDesarrolladores() {
+        mostrarMensaje(devPlus.mostrarListaDesarrolladores());
+    }
+
+    //Buscar un desarrollador por codigo
+    private static void buscarDesarrolladorPorCodigo() {
+        String codigo = pedirDatos("Ingrese el código del desarrollador a buscar:");
+
+        mostrarMensaje(devPlus.mostrarDesarrollador(codigo));
+    }
+
+    //Actualizar la informacion del desarrollador
+    private static void actualizarDesarrollador() {
+        String codigo = pedirDatos("Ingrese el código del desarrollador a actualizar:");
+        String equipoTrabajo = pedirDatos("Ingrese el nuevo equipo de trabajo del desarrollador:");
+        String nivel = pedirDatos("Ingrese el nuevo nivel del desarrollador (Junior, Semisenior, Senior):");
+        int maxProyectosSimultaneos = Integer.parseInt(pedirDatos("Ingrese la nueva cantidad máxima de proyectos simultáneos:"));
+        double tarifaDia = Double.parseDouble(pedirDatos("Ingrese la nueva tarifa por día del desarrollador:"));
+        String estado = pedirDatos("Ingrese el nuevo estado del desarrollador (Disponible, Asignado, Ocupado, En capacitación):");
+
+        boolean resultado = devPlus.actualizarDesarrollador(codigo, equipoTrabajo, nivel, maxProyectosSimultaneos, tarifaDia, estado);
+
+        if (resultado) {
+            mostrarMensaje("Desarrollador actualizado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo actualizar el desarrollador.");
+        }
+    }
+
+    //Eliminar la informacion del desarrollador
+    private static void eliminarDesarrollador() {
+        String codigo = pedirDatos("Ingrese el código del desarrollador a eliminar:");
+
+        boolean resultado = devPlus.eliminarDesarrollador(codigo);
+
+        if (resultado) {
+            mostrarMensaje("Desarrollador eliminado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo eliminar el desarrollador.");
+        }
+    }
+
+    // ----------------- gestion de proyectos -----------------
+
+    //Registrar la informacion del proyecto
+    private static void registrarProyecto() {
+        String codigo = pedirDatos("Ingrese el código del proyecto:");
+        String fechaSolicitud = pedirDatos("Ingrese la fecha de solicitud del proyecto (dd/mm/aaaa):");
+        String fechaInicio = pedirDatos("Ingrese la fecha de inicio del proyecto (dd/mm/aaaa):");
+        String fechaEntrega = pedirDatos("Ingrese la fecha de entrega del proyecto (dd/mm/aaaa):");
+        String estado = pedirDatos("Ingrese el estado del proyecto (Pendiente, Confirmado, En curso, Finalizado, Cancelado):");
+        String metodoPago = pedirDatos("Ingrese el método de pago (tarjeta de crédito, transferencia bancaria, efectivo):");
+        double valorTotalp = Double.parseDouble(pedirDatos("Ingrese el valor total del proyecto:"));
+        String identificacionCliente = pedirDatos("Ingrese la identificación del cliente que contrata el proyecto:");
+
+        boolean resultado = devPlus.registrarProyecto(codigo, fechaSolicitud, fechaInicio, fechaEntrega, estado, metodoPago, valorTotalp, identificacionCliente);
+
+        if (resultado) {
+            mostrarMensaje("Proyecto registrado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo registrar el proyecto. Verifique el código y que el cliente exista.");
+        }
+    }
+
+    //Mostrar la lista completa de proyectos
+    private static void mostrarListaProyectos() {
+        mostrarMensaje(devPlus.mostrarListaProyectos());
+    }
+
+    //Buscar un proyecto por codigo
+    private static void buscarProyectoPorCodigo() {
+        String codigo = pedirDatos("Ingrese el código del proyecto a buscar:");
+
+        mostrarMensaje(devPlus.mostrarProyecto(codigo));
+    }
+
+    //Actualizar la informacion del proyecto
+    private static void actualizarProyecto() {
+        String codigo = pedirDatos("Ingrese el código del proyecto a actualizar:");
+        String fechaSolicitud = pedirDatos("Ingrese la nueva fecha de solicitud del proyecto (dd/mm/aaaa):");
+        String fechaInicio = pedirDatos("Ingrese la nueva fecha de inicio del proyecto (dd/mm/aaaa):");
+        String fechaEntrega = pedirDatos("Ingrese la nueva fecha de entrega del proyecto (dd/mm/aaaa):");
+        String estado = pedirDatos("Ingrese el nuevo estado del proyecto (Pendiente, Confirmado, En curso, Finalizado, Cancelado):");
+        String metodoPago = pedirDatos("Ingrese el nuevo método de pago (tarjeta de crédito, transferencia bancaria, efectivo):");
+        double valorTotalp = Double.parseDouble(pedirDatos("Ingrese el nuevo valor total del proyecto:"));
+
+        boolean resultado = devPlus.actualizarProyecto(codigo, fechaSolicitud, fechaInicio, fechaEntrega, estado, metodoPago, valorTotalp);
+
+        if (resultado) {
+            mostrarMensaje("Proyecto actualizado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo actualizar el proyecto.");
+        }
+    }
+
+    //Eliminar la informacion del proyecto
+    private static void eliminarProyecto() {
+        String codigo = pedirDatos("Ingrese el código del proyecto a eliminar:");
+
+        boolean resultado = devPlus.eliminarProyecto(codigo);
+
+        if (resultado) {
+            mostrarMensaje("Proyecto eliminado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo eliminar el proyecto.");
+        }
+    }
+
+    // ----------------- gestion de servicios adicionales -----------------
+
+    //Registrar la informacion del servicio adicional
+    private static void registrarServicioAdicional() {
+        String codigo = pedirDatos("Ingrese el código del servicio adicional:");
+        String nombre = pedirDatos("Ingrese el nombre del servicio adicional:");
+        String descripcion = pedirDatos("Ingrese la descripción del servicio adicional:");
+        double precio = Double.parseDouble(pedirDatos("Ingrese el precio del servicio adicional:"));
+        boolean disponibilidad = pedirDatos("¿El servicio adicional está disponible? (S/N):").equalsIgnoreCase("S");
+
+        boolean resultado = devPlus.registrarServicioAdicional(codigo, nombre, descripcion, precio, disponibilidad);
+
+        if (resultado) {
+            mostrarMensaje("Servicio adicional registrado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo registrar el servicio adicional. Verifique que el código no esté repetido.");
+        }
+    }
+
+    //Mostrar la lista completa de servicios adicionales
+    private static void mostrarListaServiciosAdicionales() {
+        mostrarMensaje(devPlus.mostrarListaServiciosAdicionales());
+    }
+
+    //Buscar un servicio adicional por codigo
+    private static void buscarServicioAdicionalPorCodigo() {
+        String codigo = pedirDatos("Ingrese el código del servicio adicional a buscar:");
+
+        mostrarMensaje(devPlus.mostrarServicioAdicional(codigo));
+    }
+
+    //Actualizar la informacion del servicio adicional
+    private static void actualizarServicioAdicional() {
+        String codigo = pedirDatos("Ingrese el código del servicio adicional a actualizar:");
+        String nombre = pedirDatos("Ingrese el nuevo nombre del servicio adicional:");
+        String descripcion = pedirDatos("Ingrese la nueva descripción del servicio adicional:");
+        double precio = Double.parseDouble(pedirDatos("Ingrese el nuevo precio del servicio adicional:"));
+        boolean disponibilidad = pedirDatos("¿El servicio adicional está disponible? (S/N):").equalsIgnoreCase("S");
+
+        boolean resultado = devPlus.actualizarServicioAdicional(codigo, nombre, descripcion, precio, disponibilidad);
+
+        if (resultado) {
+            mostrarMensaje("Servicio adicional actualizado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo actualizar el servicio adicional.");
+        }
+    }
+
+    //Eliminar la informacion del servicio adicional
+    private static void eliminarServicioAdicional() {
+        String codigo = pedirDatos("Ingrese el código del servicio adicional a eliminar:");
+
+        boolean resultado = devPlus.eliminarServicioAdicional(codigo);
+
+        if (resultado) {
+            mostrarMensaje("Servicio adicional eliminado exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo eliminar el servicio adicional.");
+        }
+    }
 
 }
