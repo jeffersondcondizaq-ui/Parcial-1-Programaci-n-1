@@ -11,7 +11,7 @@ public class DevPlusMain {
 
         String nombre = pedirDatos("Ingrese el nombre de la empresa");
         String nit = pedirDatos("Ingrese el nit de la empresa");
-        String direccion = pedirDatos("Ingrese la direcciond de la empresa");
+        String direccion = pedirDatos("Ingrese la direccion de la empresa");
         String telefono = pedirDatos("Ingrese el telefono de contacto de la empresa");
         String paginaWeb = pedirDatos("Ingrese la pagina web de la empresa");
 
@@ -118,6 +118,7 @@ public class DevPlusMain {
                                 "\n 10. Calcular Tarifa Desarrolladores" +
                                 "\n 11. Calcular Descuento Cliente Frecuente" +
                                 "\n 12. Consultar Ingresos de Proyectos" +
+                                "\n 13. Cambiar Estado de un proyecto" +
                                 "\n 0. Regresar"));
                         switch (proyectoOption) {
                             case 1:
@@ -155,6 +156,9 @@ public class DevPlusMain {
                                 break;
                             case 12:
                                 devPlus.calcularIngresosAcumuladoProyectos();
+                                break;
+                            case 13:
+                                actualizarEstadoProyecto();
                                 break;
                             case 0:
                                 break;
@@ -561,6 +565,12 @@ public class DevPlusMain {
         } else {
             mostrarMensaje("No se pudo eliminar el servicio adicional.");
         }
+    }
+
+    //Actuailizar estado proyecto
+    private static void actualizarEstadoProyecto() {
+        String codigo = pedirDatos("Ingrese el código del proyecto al cual se le va modificar el estado:");
+        mostrarMensaje(devPlus.actualizarEstadoProyecto(codigo));
     }
 
 }

@@ -728,4 +728,19 @@ public class DevPlus {
 
     }
 
+    //Actuailizar estado proyecto
+    public String actualizarEstadoProyecto(String codigoBucar) {
+        String mensaje = "";
+        int index = encontrarIndexProyectoPorCodigo(codigoBucar);
+
+        if (index != -1) {
+            String cambioEstado = JOptionPane.showInputDialog(null, "Ingrese el nuevo estado del proyecto  (Pendiente, Confirmado, En curso, Finalizado, Cancelado)");
+            listProyecto[index].setEstado(cambioEstado);
+            mensaje = "El estado del Proyecto: " + listProyecto[index].getCodigo() + " fue cambiado exitosamente.";
+        } else {
+            mensaje = "El proyecto no se encuentra en la lista.";
+        }
+        return mensaje;
+    }
+
 }
