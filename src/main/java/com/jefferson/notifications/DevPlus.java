@@ -1,5 +1,7 @@
 package com.jefferson.notifications;
 
+import javax.swing.*;
+
 public class DevPlus {
     public String nombre;
     public String nit;
@@ -684,6 +686,46 @@ public class DevPlus {
         proyecto.setValorTotalp(valorTotal);
 
         return valorTotal;
+    }
+
+    // Calcular el valor acumulado de los proyectos
+    public void calcularIngresosAcumuladoProyectos() {
+
+
+        String fechaInicio = JOptionPane.showInputDialog("Ingrese la fecha inicial del periodo a revisar, con el formato (YYYY-MM-DD)");
+        String fechaFin = JOptionPane.showInputDialog("Ingrese la fecha final del periodo a revisar, con el formato (YYYY-MM-DD)");
+
+        if (fechaFin == null || fechaFin.equals("") || fechaInicio == null || fechaInicio.equals("")) {
+            JOptionPane.showMessageDialog(null, "Fechas no validas, porfavor respete el formato (YYYY-MM-DD)");
+        }
+
+        double totalIngresos = 0.0;
+        int cantidadProyectos = 0;
+
+        for (int i = 0; i < listProyecto.length; i++) {
+
+            if (listProyecto[i] != null) {
+                String fechaSoli = listProyecto[i].getFechaSolicitud();
+
+                if (fechaSoli.compareTo(fechaInicio) >= 0  && fechaSoli.compareTo(fechaFin) <= 0) {
+                    totalIngresos += listProyecto[i].getValorTotalp();
+                    cantidadProyectos ++;
+                }
+
+            }
+        }
+
+        if (cantidadProyectos >= 1 ) {
+            JOptionPane.showMessageDialog(null,
+                    "~~ INGRESOS TOTALES POR PERÍODO ~~\n" +
+                            "Rango de fechas: " + fechaInicio + " a " + fechaFin + "\n" +
+                            "Proyectos encontrados: " + cantidadProyectos + "\n" +
+                            "Total de ingresos acumulados: $" + totalIngresos);
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "No se encontraron proyectos contratados entre " + fechaInicio + " y " + fechaFin);
+        }
+
     }
 
 }

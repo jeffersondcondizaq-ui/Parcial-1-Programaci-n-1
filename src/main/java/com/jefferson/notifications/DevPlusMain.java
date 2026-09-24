@@ -117,6 +117,7 @@ public class DevPlusMain {
                                 "\n 9. Calcular Cantidad de Dias de Desarrollo" +
                                 "\n 10. Calcular Tarifa Desarrolladores" +
                                 "\n 11. Calcular Descuento Cliente Frecuente" +
+                                "\n 12. Consultar Ingresos de Proyectos" +
                                 "\n 0. Regresar"));
                         switch (proyectoOption) {
                             case 1:
@@ -151,6 +152,9 @@ public class DevPlusMain {
                                 break;
                             case 11:
                                 calcularDescuentoClienteFrecuente();
+                                break;
+                            case 12:
+                                devPlus.calcularIngresosAcumuladoProyectos();
                                 break;
                             case 0:
                                 break;
