@@ -565,4 +565,125 @@ public class DevPlus {
         return -1;
     }
 
+    //    --------------------------Calculos del proyecto
+
+    //Agrega un servicio adicional a un proyecto ya registrado
+    public boolean agregarServicioAdicionalAProyecto(String codigoProyecto, String codigoServicio) {
+        int indexProyecto = encontrarIndexProyectoPorCodigo(codigoProyecto);
+        int indexServicio = encontrarIndexServicioAdicionalPorCodigo(codigoServicio);
+
+        if (indexProyecto != -1 && indexServicio != -1) {
+            ServicioAdicional[] listaServiciosProyecto = listProyecto[indexProyecto].getListServicioAdicional();
+
+            for (int i = 0; i < listaServiciosProyecto.length; i++) {
+                if (listaServiciosProyecto[i] == null) {
+                    listaServiciosProyecto[i] = listServicioAdicional[indexServicio];
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    //Suma el precio de los servicios adicionales agregados a un proyecto
+    public double calcularValorServiciosAdicionales(String codigoProyecto) {
+        int index = encontrarIndexProyectoPorCodigo(codigoProyecto);
+
+        if (index == -1) {
+            return -1;
+        }
+
+        ServicioAdicional[] listaServiciosProyecto = listProyecto[index].getListServicioAdicional();
+        double valorServicios = 0;
+
+        for (int i = 0; i < listaServiciosProyecto.length; i++) {
+            if (listaServiciosProyecto[i] != null) {
+                valorServicios += listaServiciosProyecto[i].getPrecio();
+            }
+        }
+
+        return valorServicios;
+    }
+
+    //Convierte una fecha dd/mm/aaaa en un numero para poder restar fechas de forma basica
+    private int convertirFechaANumero(String fecha) {
+        String[] partesFecha = fecha.split("/");
+        int dia = Integer.parseInt(partesFecha[0]);
+        int mes = Integer.parseInt(partesFecha[1]);
+        int anio = Integer.parseInt(partesFecha[2]);
+
+        return (anio * 360) + (mes * 30) + dia;
+    }
+
+    //Calcula la cantidad de dias de desarrollo de un proyecto (fechaInicio - fechaEntrega)
+    public int calcularCantidadDias(String codigoProyecto) {
+        int index = encontrarIndexProyectoPorCodigo(codigoProyecto);
+
+        if (index == -1) {
+            return -1;
+        }
+
+        int numeroInicio = convertirFechaANumero(listProyecto[index].getFechaInicio());
+        int numeroEntrega = convertirFechaANumero(listProyecto[index].getFechaEntrega());
+
+        return numeroEntrega - numeroInicio;
+    }
+
+    //Calcula la tarifa total de un desarrollador para una cantidad de dias trabajados
+    public double calcularTarifaDesarrolladores(String codigoDesarrollador, int cantidadDias) {
+        int index = encontrarIndexDesarrolladorPorCodigo(codigoDesarrollador);
+
+        if (index == -1) {
+            return -1;
+        }
+
+        return listDesarrollador[index].getTarifaDia() * cantidadDias;
+    }
+
+    //Calcula el posible descuento de un cliente frecuente sobre un subtotal
+    public double calcularDescuentoClienteFrecuente(String identificacionCliente, double subtotal) {
+        int index = encontrarIndexClientePorId(identificacionCliente);
+
+        if (index == -1) {
+            return -1;
+        }
+
+        double descuento = 0;
+
+        if (listCliente[index].isEsFrecuente()) {
+            descuento = subtotal * 0.1;
+        }
+
+        return descuento;
+    }
+
+    //Calcula el valor total de un proyecto teniendo en cuenta tarifa de desarrolladores,
+    //dias de desarrollo, servicios adicionales y descuentos de clientes frecuentes
+    public double calcularValorTotalProyecto(String codigoProyecto, String codigoDesarrollador) {
+        int indexProyecto = encontrarIndexProyectoPorCodigo(codigoProyecto);
+
+        if (indexProyecto == -1) {
+            return -1;
+        }
+
+        Proyecto proyecto = listProyecto[indexProyecto];
+
+        int cantidadDias = calcularCantidadDias(codigoProyecto);
+        double tarifaDesarrolladores = calcularTarifaDesarrolladores(codigoDesarrollador, cantidadDias);
+
+        if (tarifaDesarrolladores == -1) {
+            return -1;
+        }
+
+        double valorServicios = calcularValorServiciosAdicionales(codigoProyecto);
+        double descuento = calcularDescuentoClienteFrecuente(proyecto.getCliente().getIdentificacion(), tarifaDesarrolladores + valorServicios);
+
+        double valorTotal = tarifaDesarrolladores + valorServicios - descuento;
+
+        proyecto.setValorTotalp(valorTotal);
+
+        return valorTotal;
+    }
+
 }

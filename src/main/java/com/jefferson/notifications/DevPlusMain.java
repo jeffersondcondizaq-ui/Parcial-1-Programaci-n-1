@@ -111,6 +111,12 @@ public class DevPlusMain {
                                 "\n 4. Mostrar Proyecto por Codigo" +
                                 "\n 5. Actualizar Proyecto" +
                                 "\n 5. Eliminar Proyecto" +
+                                "\n 6. Calcular Valor Total del Proyecto" +
+                                "\n 7. Agregar Servicio Adicional a Proyecto" +
+                                "\n 8. Calcular Valor Servicios Adicionales" +
+                                "\n 9. Calcular Cantidad de Dias de Desarrollo" +
+                                "\n 10. Calcular Tarifa Desarrolladores" +
+                                "\n 11. Calcular Descuento Cliente Frecuente" +
                                 "\n 0. Regresar"));
                         switch (proyectoOption) {
                             case 1:
@@ -127,6 +133,24 @@ public class DevPlusMain {
                                 break;
                             case 5:
                                 eliminarProyecto();
+                                break;
+                            case 6:
+                                calcularValorTotalProyecto();
+                                break;
+                            case 7:
+                                agregarServicioAProyecto();
+                                break;
+                            case 8:
+                                calcularValorServiciosAdicionalesProyecto();
+                                break;
+                            case 9:
+                                calcularCantidadDiasProyecto();
+                                break;
+                            case 10:
+                                calcularTarifaDesarrolladores();
+                                break;
+                            case 11:
+                                calcularDescuentoClienteFrecuente();
                                 break;
                             case 0:
                                 break;
@@ -389,6 +413,88 @@ public class DevPlusMain {
             mostrarMensaje("Proyecto eliminado exitosamente.");
         } else {
             mostrarMensaje("No se pudo eliminar el proyecto.");
+        }
+    }
+
+    //Agregar un servicio adicional a un proyecto
+    private static void agregarServicioAProyecto() {
+        String codigoProyecto = pedirDatos("Ingrese el código del proyecto:");
+        String codigoServicio = pedirDatos("Ingrese el código del servicio adicional a agregar:");
+
+        boolean resultado = devPlus.agregarServicioAdicionalAProyecto(codigoProyecto, codigoServicio);
+
+        if (resultado) {
+            mostrarMensaje("Servicio adicional agregado al proyecto exitosamente.");
+        } else {
+            mostrarMensaje("No se pudo agregar el servicio adicional. Verifique los códigos ingresados.");
+        }
+    }
+
+    //Calcular el valor de los servicios adicionales agregados a un proyecto
+    private static void calcularValorServiciosAdicionalesProyecto() {
+        String codigoProyecto = pedirDatos("Ingrese el código del proyecto:");
+
+        double valorServicios = devPlus.calcularValorServiciosAdicionales(codigoProyecto);
+
+        if (valorServicios == -1) {
+            mostrarMensaje("El proyecto no se encuentra en la lista.");
+        } else {
+            mostrarMensaje("Valor de los servicios adicionales del proyecto: " + valorServicios);
+        }
+    }
+
+    //Calcular la cantidad de dias de desarrollo de un proyecto
+    private static void calcularCantidadDiasProyecto() {
+        String codigoProyecto = pedirDatos("Ingrese el código del proyecto:");
+
+        int cantidadDias = devPlus.calcularCantidadDias(codigoProyecto);
+
+        if (cantidadDias == -1) {
+            mostrarMensaje("El proyecto no se encuentra en la lista.");
+        } else {
+            mostrarMensaje("Cantidad de días de desarrollo: " + cantidadDias);
+        }
+    }
+
+    //Calcular la tarifa total de un desarrollador segun los dias trabajados
+    private static void calcularTarifaDesarrolladores() {
+        String codigoDesarrollador = pedirDatos("Ingrese el código del desarrollador:");
+        int cantidadDias = Integer.parseInt(pedirDatos("Ingrese la cantidad de días trabajados:"));
+
+        double tarifa = devPlus.calcularTarifaDesarrolladores(codigoDesarrollador, cantidadDias);
+
+        if (tarifa == -1) {
+            mostrarMensaje("El desarrollador no se encuentra en la lista.");
+        } else {
+            mostrarMensaje("Tarifa total del desarrollador: " + tarifa);
+        }
+    }
+
+    //Calcular el descuento de un cliente frecuente sobre un subtotal
+    private static void calcularDescuentoClienteFrecuente() {
+        String identificacionCliente = pedirDatos("Ingrese la identificación del cliente:");
+        double subtotal = Double.parseDouble(pedirDatos("Ingrese el subtotal sobre el cual calcular el descuento:"));
+
+        double descuento = devPlus.calcularDescuentoClienteFrecuente(identificacionCliente, subtotal);
+
+        if (descuento == -1) {
+            mostrarMensaje("El cliente no se encuentra en la lista.");
+        } else {
+            mostrarMensaje("Descuento correspondiente: " + descuento);
+        }
+    }
+
+    //Calcular el valor total del proyecto (tarifa desarrollador + servicios - descuento)
+    private static void calcularValorTotalProyecto() {
+        String codigoProyecto = pedirDatos("Ingrese el código del proyecto:");
+        String codigoDesarrollador = pedirDatos("Ingrese el código del desarrollador asignado:");
+
+        double valorTotal = devPlus.calcularValorTotalProyecto(codigoProyecto, codigoDesarrollador);
+
+        if (valorTotal == -1) {
+            mostrarMensaje("No se pudo calcular el valor total. Verifique los códigos ingresados.");
+        } else {
+            mostrarMensaje("Valor total del proyecto: " + valorTotal);
         }
     }
 
