@@ -728,7 +728,7 @@ public class DevPlus {
 
     }
 
-    //Actuailizar estado proyecto
+    // Actualizar estado proyecto
     public String actualizarEstadoProyecto(String codigoBucar) {
         String mensaje = "";
         int index = encontrarIndexProyectoPorCodigo(codigoBucar);
@@ -741,6 +741,72 @@ public class DevPlus {
             mensaje = "El proyecto no se encuentra en la lista.";
         }
         return mensaje;
+    }
+
+    // Agregar desarroladores
+    public boolean agregarDesarrolladorProyecto(String codigoDesarrollador, String codigoProyecto) {
+        boolean resultado = false;
+        int indexProyecto = encontrarIndexProyectoPorCodigo(codigoProyecto);
+        int indexDesarrollador = encontrarIndexDesarrolLadorPorCodigo(codigoDesarrollador);
+
+
+        if (indexProyecto == -1) {
+            JOptionPane.showMessageDialog(null, "El proyecto especificado no existe.");
+            return false;
+        }
+
+        if (indexDesarrollador == -1) {
+            JOptionPane.showMessageDialog(null, "El desarrollador especificado no existe.");
+            return false;
+        }
+
+        // Validar disponibilidad
+        if (validarDisponibilidadDesarrollador(indexDesarrollador)) {
+            Desarrollador[] listaDesarrolladorProyecto = listProyecto[indexProyecto].getListDesarrolador();
+
+            for (int i = 0; i < listaDesarrolladorProyecto.length; i++) {
+                if (listaDesarrolladorProyecto[i] == null) {
+                    listaDesarrolladorProyecto[i] = listDesarrollador[indexDesarrollador];
+                    actualizarEstadoDesarroladorPorProyecto(indexDesarrollador);
+                    resultado = true;
+                    break;
+                }
+            }
+
+            if (!resultado) {
+                JOptionPane.showMessageDialog(null, "El proyecto ya tiene el cupo máximo de desarrolladores.");
+            }
+        }
+        return resultado;
+    }
+
+    public boolean validarDisponibilidadDesarrollador(int indexDesarrollador) {
+
+        if (listDesarrollador[indexDesarrollador] != null &&
+                listDesarrollador[indexDesarrollador].getEstado().equalsIgnoreCase("Disponible")) {
+
+            JOptionPane.showMessageDialog(null, "Desarrollador disponible.");
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "El desarrollador no está disponible.");
+            return false;
+        }
+    }
+
+    public int encontrarIndexDesarrolLadorPorCodigo(String codigoBuscar) {
+        for (int i = 0; i < listDesarrollador.length; i++) {
+            if (listDesarrollador[i] != null && listDesarrollador[i].getCodigo().equals(codigoBuscar)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void actualizarEstadoDesarroladorPorProyecto(int codigoDesarrollador) {
+        String mensaje = "";
+            String cambioEstado = "Ocupado";
+            listDesarrollador[codigoDesarrollador].setEstado(cambioEstado);
+            JOptionPane.showMessageDialog(null, "El desarrollador "+ listDesarrollador[codigoDesarrollador].getCodigo() + " fue asiganado a un proyecto.");
     }
 
 }

@@ -119,6 +119,7 @@ public class DevPlusMain {
                                 "\n 11. Calcular Descuento Cliente Frecuente" +
                                 "\n 12. Consultar Ingresos de Proyectos" +
                                 "\n 13. Cambiar Estado de un proyecto" +
+                                "\n 14. Agregar Desarrollador a un proyecto" +
                                 "\n 0. Regresar"));
                         switch (proyectoOption) {
                             case 1:
@@ -159,6 +160,9 @@ public class DevPlusMain {
                                 break;
                             case 13:
                                 actualizarEstadoProyecto();
+                                break;
+                            case 14:
+                                agregarDesarrolladorProyecto();
                                 break;
                             case 0:
                                 break;
@@ -567,10 +571,22 @@ public class DevPlusMain {
         }
     }
 
-    //Actuailizar estado proyecto
+    // Actuailizar estado proyecto
     private static void actualizarEstadoProyecto() {
         String codigo = pedirDatos("Ingrese el código del proyecto al cual se le va modificar el estado:");
         mostrarMensaje(devPlus.actualizarEstadoProyecto(codigo));
+    }
+
+    // Agregar desarrollador a un proyecto
+    private static void agregarDesarrolladorProyecto() {
+        String codigoDes = pedirDatos("Ingrese el código del desarollador que quiere agregar :");
+        String codigoPro = pedirDatos("Ingrese el código del proyecto: ");
+
+        if (devPlus.agregarDesarrolladorProyecto(codigoDes, codigoPro)){
+            JOptionPane.showMessageDialog(null, "Proceso Exitoso");
+        } else {
+            JOptionPane.showMessageDialog(null, "Proceso Fallido");
+        }
     }
 
 }
