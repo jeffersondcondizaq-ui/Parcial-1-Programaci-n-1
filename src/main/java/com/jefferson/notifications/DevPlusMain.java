@@ -38,7 +38,7 @@ public class DevPlusMain {
                                 "\n 2. Mostrar Clientes" +
                                 "\n 3. Mostrar Cliente por ID" +
                                 "\n 4. Actualizar Cliente" +
-                                "\n 5. Eliminar Cliente por Telefono" +
+                                "\n 5. Eliminar Cliente por ID" +
                                 "\n 6. Buscar Cliente por Telefono" +
                                 "\n 0. Regresar"));
                         switch (clienteOption) {
@@ -55,7 +55,7 @@ public class DevPlusMain {
                                 actualizarCliente();
                                 break;
                             case 5:
-                                eliminarClientePorTelefono();
+                                eliminarClientePorID();
                                 break;
                             case 6:
                                 buscarClientePorTelefono();
@@ -287,10 +287,10 @@ public class DevPlusMain {
     }
 
     //Eliminar un cliente por telefono
-    private static void eliminarClientePorTelefono() {
-        String telefono = pedirDatos("Ingrese el teléfono del cliente a eliminar:");
+    private static void eliminarClientePorID() {
+        String id = pedirDatos("Ingrese el ID del cliente a eliminar:");
 
-        boolean resultado = devPlus.eliminarClientePorTelefono(telefono);
+        boolean resultado = devPlus.eliminarClientePorId(id);
 
         if (resultado) {
             mostrarMensaje("Cliente eliminado exitosamente.");

@@ -221,9 +221,9 @@ public class DevPlus {
     }
 
     //D - Eliminar/Quitar un cliente por telefono
-    public boolean eliminarClientePorTelefono(String telefonoEliminar) {
+    public boolean eliminarClientePorId(String idEliminar) {
         boolean respuesta = false;
-        int index = encontrarIndexClientePorTelefono(telefonoEliminar);
+        int index = encontrarIndexClientePorId(idEliminar);
 
         if (index != -1) {
             listCliente[index] = null;
@@ -287,7 +287,8 @@ public class DevPlus {
                     "\nNivel: " + desarrolladorEncontrado.getNivel() +
                     "\nMáx. proyectos simultáneos: " + desarrolladorEncontrado.getMaxProyectosSimultaneos() +
                     "\nTarifa por día: " + desarrolladorEncontrado.getTarifaDia() +
-                    "\nEstado: " + desarrolladorEncontrado.getEstado();
+                    "\nEstado: " + desarrolladorEncontrado.getEstado() +
+                    "\nProyectos asignados:" + desarrolladorEncontrado.listarProyectosAsignados();
         } else {
             mensaje = "El desarrollador no se encuentra en la lista.";
         }
@@ -306,7 +307,8 @@ public class DevPlus {
                         "\nNivel: " + listDesarrollador[i].getNivel() +
                         "\nMáx. proyectos simultáneos: " + listDesarrollador[i].getMaxProyectosSimultaneos() +
                         "\nTarifa por día: " + listDesarrollador[i].getTarifaDia() +
-                        "\nEstado: " + listDesarrollador[i].getEstado() + "\n";
+                        "\nEstado: " + listDesarrollador[i].getEstado() +
+                        "\nProyectos asignados:" + listDesarrollador[i].listarProyectosAsignados() + "\n";
             }
         }
 
@@ -494,7 +496,9 @@ public class DevPlus {
                     "\nMétodo de pago: " + proyectoEncontrado.getMetodoPago() +
                     "\nValor total: " + proyectoEncontrado.getValorTotalp() +
                     "\nCliente: " + proyectoEncontrado.getCliente().getNombre() +
-                    " (" + proyectoEncontrado.getCliente().getIdentificacion() + ")";
+                    " (" + proyectoEncontrado.getCliente().getIdentificacion() + ")" +
+                    "\nDesarrolladores asignados:" + proyectoEncontrado.listarDesarrolladoresAsignados();
+
         } else {
             mensaje = "El proyecto no se encuentra en la lista.";
         }
@@ -515,7 +519,8 @@ public class DevPlus {
                         "\nEstado: " + listProyecto[i].getEstado() +
                         "\nMétodo de pago: " + listProyecto[i].getMetodoPago() +
                         "\nValor total: " + listProyecto[i].getValorTotalp() +
-                        "\nCliente: " + listProyecto[i].getCliente().getNombre() + "\n";
+                        "\nCliente: " + listProyecto[i].getCliente().getNombre() +
+                        "\nDesarrolladores asignados:" + listProyecto[i].listarDesarrolladoresAsignados() + "\n";
             }
         }
 
@@ -656,6 +661,7 @@ public class DevPlus {
 
         if (fechaFin <= 0 || fechaInicio <= 0 ) {
             JOptionPane.showMessageDialog(null, "Fechas no validas, porfavor respete el formato (dd/mm/aaaa)");
+            return;
         }
 
         double totalIngresos = 0.0;
@@ -695,6 +701,18 @@ public class DevPlus {
         if (index != -1) {
             String cambioEstado = JOptionPane.showInputDialog(null, "Ingrese el nuevo estado del proyecto  (Pendiente, Confirmado, En curso, Finalizado, Cancelado)");
             listProyecto[index].cambiarEstadoProyecto(cambioEstado);
+
+            // Si el proyecto queda Confirmado, todos sus desarrolladores asignados pasan a Ocupado
+            if (cambioEstado.equalsIgnoreCase("Confirmado")) {
+                Desarrollador[] desarrolladoresProyecto = listProyecto[index].getListDesarrolador();
+
+                for (int i = 0; i < desarrolladoresProyecto.length; i++) {
+                    if (desarrolladoresProyecto[i] != null) {
+                        desarrolladoresProyecto[i].cambiarEstadoDesarrollador("Ocupado");
+                    }
+                }
+            }
+
             mensaje = "El estado del Proyecto: " + listProyecto[index].getCodigo() + " fue cambiado exitosamente.";
         } else {
             mensaje = "El proyecto no se encuentra en la lista.";
@@ -740,10 +758,15 @@ public class DevPlus {
     //asignado cuyas fechas se crucen con las del proyecto solicitado
     public boolean validarDisponibilidadDesarrollador(int indexDesarrollador, String codigoProyecto) {
 
-        if (listDesarrollador[indexDesarrollador] == null ||
-                !listDesarrollador[indexDesarrollador].getEstado().equalsIgnoreCase("Disponible")) {
+        Desarrollador desarrollador = listDesarrollador[indexDesarrollador];
 
+        if (desarrollador == null || !desarrollador.getEstado().equalsIgnoreCase("Disponible")) {
             JOptionPane.showMessageDialog(null, "El desarrollador no está disponible.");
+            return false;
+        }
+
+        if (desarrollador.contarProyectosAsignados() >= desarrollador.getMaxProyectosSimultaneos()) {
+            JOptionPane.showMessageDialog(null, "El desarrollador ya alcanzó su límite de proyectos simultáneos.");
             return false;
         }
 
@@ -753,23 +776,17 @@ public class DevPlus {
             return false;
         }
 
-        Desarrollador desarrollador = listDesarrollador[indexDesarrollador];
         Proyecto proyectoSolicitado = listProyecto[indexProyectoSolicitado];
+        Proyecto[] proyectosDesarrollador = desarrollador.getListProyecto();
 
-        for (int i = 0; i < listProyecto.length; i++) {
-            if (listProyecto[i] != null && listProyecto[i] != proyectoSolicitado) {
-                Desarrollador[] desarrolladoresProyecto = listProyecto[i].getListDesarrolador();
+        for (int i = 0; i < proyectosDesarrollador.length; i++) {
+            if (proyectosDesarrollador[i] != null && proyectosDesarrollador[i] != proyectoSolicitado) {
+                boolean estaDisponible = proyectosDesarrollador[i].validarDisponibilidad(
+                        proyectoSolicitado.getFechaInicio(), proyectoSolicitado.getFechaEntrega());
 
-                for (int j = 0; j < desarrolladoresProyecto.length; j++) {
-                    if (desarrolladoresProyecto[j] == desarrollador) {
-                        boolean estaDisponible = listProyecto[i].validarDisponibilidad(
-                                proyectoSolicitado.getFechaInicio(), proyectoSolicitado.getFechaEntrega());
-
-                        if (!estaDisponible) {
-                            JOptionPane.showMessageDialog(null, "El desarrollador no está disponible en las fechas solicitadas.");
-                            return false;
-                        }
-                    }
+                if (!estaDisponible) {
+                    JOptionPane.showMessageDialog(null, "El desarrollador no está disponible en las fechas solicitadas.");
+                    return false;
                 }
             }
         }

@@ -74,4 +74,56 @@ public class Desarrollador {
         this.estado = nuevoEstado;
         return "El desarrollador " + this.codigo + " fue asiganado a un proyecto.";
     }
+
+    public Proyecto[] getListProyecto() {
+        return listProyecto;
+    }
+
+    public void setListProyecto(Proyecto[] listProyecto) {
+        this.listProyecto = listProyecto;
+    }
+
+    //Agrega un proyecto a la lista de proyectos de este desarrollador
+    public boolean agregarProyecto(Proyecto proyecto) {
+        for (int i = 0; i < listProyecto.length; i++) {
+            if (listProyecto[i] == null) {
+                listProyecto[i] = proyecto;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Cuenta en cuantos proyectos esta actualmente asignado este desarrollador
+    public int contarProyectosAsignados() {
+        int contador = 0;
+
+        for (int i = 0; i < listProyecto.length; i++) {
+            if (listProyecto[i] != null) {
+                contador++;
+            }
+        }
+
+        return contador;
+    }
+
+    //Arma el texto con los proyectos en los que esta asignado este desarrollador
+    public String listarProyectosAsignados() {
+        String mensaje = "";
+        boolean tieneProyectos = false;
+
+        for (int i = 0; i < listProyecto.length; i++) {
+            if (listProyecto[i] != null) {
+                mensaje += "\n  - " + listProyecto[i].getCodigo() + " (" + listProyecto[i].getEstado() + ")";
+                tieneProyectos = true;
+            }
+        }
+
+        if (!tieneProyectos) {
+            mensaje = "\n  Sin proyectos asignados.";
+        }
+
+        return mensaje;
+    }
 }

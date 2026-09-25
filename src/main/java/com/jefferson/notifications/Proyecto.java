@@ -118,11 +118,31 @@ public class Proyecto {
         for (int i = 0; i < listDesarrolador.length; i++) {
             if (listDesarrolador[i] == null) {
                 listDesarrolador[i] = desarrollador;
+                desarrollador.agregarProyecto(this);
                 return true;
             }
         }
 
         return false;
+    }
+
+    //Arma el texto con los desarrolladores asignados a este proyecto
+    public String listarDesarrolladoresAsignados() {
+        String mensaje = "";
+        boolean tieneDesarrolladores = false;
+
+        for (int i = 0; i < listDesarrolador.length; i++) {
+            if (listDesarrolador[i] != null) {
+                mensaje += "\n  - " + listDesarrolador[i].getCodigo() + " (" + listDesarrolador[i].getNivel() + ")";
+                tieneDesarrolladores = true;
+            }
+        }
+
+        if (!tieneDesarrolladores) {
+            mensaje = "\n  Sin desarrolladores asignados.";
+        }
+
+        return mensaje;
     }
 
     //Agrega un servicio adicional a este proyecto
