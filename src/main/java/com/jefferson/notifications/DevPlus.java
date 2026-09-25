@@ -610,7 +610,16 @@ public class DevPlus {
 
     //Convierte una fecha dd/mm/aaaa en un numero para poder restar fechas de forma basica
     private int convertirFechaANumero(String fecha) {
-        String[] partesFecha = fecha.split("/");
+        String[] partesFecha = {"","",""};
+        int indice = 0;
+
+        for (int i = 0; i < fecha.length() ; i++) {
+            if(fecha.charAt(i) == '/'){
+                indice ++;
+            }else {
+                partesFecha[indice] += fecha.charAt(i);
+            }
+        }
         int dia = Integer.parseInt(partesFecha[0]);
         int mes = Integer.parseInt(partesFecha[1]);
         int anio = Integer.parseInt(partesFecha[2]);
@@ -692,11 +701,11 @@ public class DevPlus {
     public void calcularIngresosAcumuladoProyectos() {
 
 
-        String fechaInicio = JOptionPane.showInputDialog("Ingrese la fecha inicial del periodo a revisar, con el formato (YYYY-MM-DD)");
-        String fechaFin = JOptionPane.showInputDialog("Ingrese la fecha final del periodo a revisar, con el formato (YYYY-MM-DD)");
+        int fechaInicio = convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha inicial del periodo a revisar, con el formato (dd/mm/aaaa)"));
+        int fechaFin = convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha final del periodo a revisar, con el formato (dd/mm/aaaa)"));
 
-        if (fechaFin == null || fechaFin.equals("") || fechaInicio == null || fechaInicio.equals("")) {
-            JOptionPane.showMessageDialog(null, "Fechas no validas, porfavor respete el formato (YYYY-MM-DD)");
+        if (fechaFin <= 0 || fechaInicio <= 0 ) {
+            JOptionPane.showMessageDialog(null, "Fechas no validas, porfavor respete el formato (dd/mm/aaaa)");
         }
 
         double totalIngresos = 0.0;
@@ -705,9 +714,9 @@ public class DevPlus {
         for (int i = 0; i < listProyecto.length; i++) {
 
             if (listProyecto[i] != null) {
-                String fechaSoli = listProyecto[i].getFechaSolicitud();
+                int fechaSoli = convertirFechaANumero(listProyecto[i].getFechaSolicitud());
 
-                if (fechaSoli.compareTo(fechaInicio) >= 0  && fechaSoli.compareTo(fechaFin) <= 0) {
+                if (fechaInicio >= fechaSoli && fechaSoli <= fechaFin) {
                     totalIngresos += listProyecto[i].getValorTotalp();
                     cantidadProyectos ++;
                 }
@@ -760,15 +769,20 @@ public class DevPlus {
             return false;
         }
 
-        // Validar disponibilidad
-        if (validarDisponibilidadDesarrollador(indexDesarrollador)) {
+        // Validar disponibilidad segun las fechas del proyecto
+        if (validarDisponibilidadDesarrollador(indexDesarrollador, codigoProyecto)) {
             Desarrollador[] listaDesarrolladorProyecto = listProyecto[indexProyecto].getListDesarrolador();
 
             for (int i = 0; i < listaDesarrolladorProyecto.length; i++) {
                 if (listaDesarrolladorProyecto[i] == null) {
                     listaDesarrolladorProyecto[i] = listDesarrollador[indexDesarrollador];
-                    actualizarEstadoDesarroladorPorProyecto(indexDesarrollador);
                     resultado = true;
+                    String estadoProyecto = listProyecto[indexProyecto].getEstado();
+                    // Solo se marca Ocupado si el proyecto ya esta Confirmado
+                    if (estadoProyecto.equalsIgnoreCase("Confirmado")) {
+                        actualizarEstadoDesarroladorPorProyecto(indexDesarrollador,estadoProyecto);
+                    }
+
                     break;
                 }
             }
@@ -780,17 +794,50 @@ public class DevPlus {
         return resultado;
     }
 
-    public boolean validarDisponibilidadDesarrollador(int indexDesarrollador) {
+    //Valida que el desarrollador este Disponible y que no tenga otro proyecto
+    //asignado cuyas fechas se crucen con las del proyecto solicitado
+    public boolean validarDisponibilidadDesarrollador(int indexDesarrollador, String codigoProyecto) {
 
-        if (listDesarrollador[indexDesarrollador] != null &&
-                listDesarrollador[indexDesarrollador].getEstado().equalsIgnoreCase("Disponible")) {
+        if (listDesarrollador[indexDesarrollador] == null ||
+                !listDesarrollador[indexDesarrollador].getEstado().equalsIgnoreCase("Disponible")) {
 
-            JOptionPane.showMessageDialog(null, "Desarrollador disponible.");
-            return true;
-        } else {
             JOptionPane.showMessageDialog(null, "El desarrollador no está disponible.");
             return false;
         }
+
+        int indexProyectoSolicitado = encontrarIndexProyectoPorCodigo(codigoProyecto);
+
+        if (indexProyectoSolicitado == -1) {
+            return false;
+        }
+
+        Desarrollador desarrollador = listDesarrollador[indexDesarrollador];
+        Proyecto proyectoSolicitado = listProyecto[indexProyectoSolicitado];
+        int inicioSolicitado = convertirFechaANumero(proyectoSolicitado.getFechaInicio());
+        int entregaSolicitado = convertirFechaANumero(proyectoSolicitado.getFechaEntrega());
+
+        for (int i = 0; i < listProyecto.length; i++) {
+            if (listProyecto[i] != null && listProyecto[i] != proyectoSolicitado) {
+                Desarrollador[] desarrolladoresProyecto = listProyecto[i].getListDesarrolador();
+
+                for (int j = 0; j < desarrolladoresProyecto.length; j++) {
+                    if (desarrolladoresProyecto[j] == desarrollador) {
+                        int inicioExistente = convertirFechaANumero(listProyecto[i].getFechaInicio());
+                        int entregaExistente = convertirFechaANumero(listProyecto[i].getFechaEntrega());
+
+                        boolean seCruzanLasFechas = inicioSolicitado <= entregaExistente && inicioExistente <= entregaSolicitado;
+
+                        if (seCruzanLasFechas) {
+                            JOptionPane.showMessageDialog(null, "El desarrollador no está disponible en las fechas solicitadas.");
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        JOptionPane.showMessageDialog(null, "Desarrollador disponible.");
+        return true;
     }
 
     public int encontrarIndexDesarrolLadorPorCodigo(String codigoBuscar) {
@@ -802,9 +849,11 @@ public class DevPlus {
         return -1;
     }
 
-    public void actualizarEstadoDesarroladorPorProyecto(int codigoDesarrollador) {
-        String mensaje = "";
+    public void actualizarEstadoDesarroladorPorProyecto(int codigoDesarrollador, String estadoProyecto) {
             String cambioEstado = "Ocupado";
+            if (estadoProyecto.equals("(Pendiente")){
+                cambioEstado = "Asignado";
+            }
             listDesarrollador[codigoDesarrollador].setEstado(cambioEstado);
             JOptionPane.showMessageDialog(null, "El desarrollador "+ listDesarrollador[codigoDesarrollador].getCodigo() + " fue asiganado a un proyecto.");
     }
