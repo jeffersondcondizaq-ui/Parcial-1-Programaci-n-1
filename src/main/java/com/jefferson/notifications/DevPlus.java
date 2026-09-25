@@ -162,11 +162,9 @@ public class DevPlus {
     //R - Buscar un cliente por telefono
     public String buscarClientePorTelefono(String telefonoBuscar) {
         String mensaje;
-        int index = encontrarIndexClientePorTelefono(telefonoBuscar);
+        Cliente clienteEncontrado = Cliente.buscarClientePorTelefono(listCliente, telefonoBuscar);
 
-        if (index != -1) {
-            Cliente clienteEncontrado = listCliente[index];
-
+        if (clienteEncontrado != null) {
             mensaje = "Cliente encontrado:\n" +
                     "\nIdentificación: " + clienteEncontrado.getIdentificacion() +
                     "\nNombre: " + clienteEncontrado.getNombre() +
@@ -186,14 +184,14 @@ public class DevPlus {
     //(un numero perfecto es igual a la suma de sus divisores propios,
     // por ejemplo: 6, 28, 496, 8128)
     public static boolean esPerfecto(String numeroValidar) {
-        int numero = Integer.parseInt(numeroValidar);
+        long numero = Long.parseLong(numeroValidar);
         if (numero <= 1) {
             return false;
         }
 
-        int suma = 0;
+        long suma = 0;
 
-        for (int i = 1; i <= numero / 2; i++) {
+        for (long i = 1; i <= numero / 2; i++) {
             if (numero % i == 0) {
                 suma += i;
             }
@@ -575,14 +573,7 @@ public class DevPlus {
         int indexServicio = encontrarIndexServicioAdicionalPorCodigo(codigoServicio);
 
         if (indexProyecto != -1 && indexServicio != -1) {
-            ServicioAdicional[] listaServiciosProyecto = listProyecto[indexProyecto].getListServicioAdicional();
-
-            for (int i = 0; i < listaServiciosProyecto.length; i++) {
-                if (listaServiciosProyecto[i] == null) {
-                    listaServiciosProyecto[i] = listServicioAdicional[indexServicio];
-                    return true;
-                }
-            }
+            return listProyecto[indexProyecto].agregarServicioAdicional(listServicioAdicional[indexServicio]);
         }
 
         return false;
@@ -596,35 +587,7 @@ public class DevPlus {
             return -1;
         }
 
-        ServicioAdicional[] listaServiciosProyecto = listProyecto[index].getListServicioAdicional();
-        double valorServicios = 0;
-
-        for (int i = 0; i < listaServiciosProyecto.length; i++) {
-            if (listaServiciosProyecto[i] != null) {
-                valorServicios += listaServiciosProyecto[i].getPrecio();
-            }
-        }
-
-        return valorServicios;
-    }
-
-    //Convierte una fecha dd/mm/aaaa en un numero para poder restar fechas de forma basica
-    private int convertirFechaANumero(String fecha) {
-        String[] partesFecha = {"","",""};
-        int indice = 0;
-
-        for (int i = 0; i < fecha.length() ; i++) {
-            if(fecha.charAt(i) == '/'){
-                indice ++;
-            }else {
-                partesFecha[indice] += fecha.charAt(i);
-            }
-        }
-        int dia = Integer.parseInt(partesFecha[0]);
-        int mes = Integer.parseInt(partesFecha[1]);
-        int anio = Integer.parseInt(partesFecha[2]);
-
-        return (anio * 360) + (mes * 30) + dia;
+        return listProyecto[index].calcularValorServiciosAdicionales();
     }
 
     //Calcula la cantidad de dias de desarrollo de un proyecto (fechaInicio - fechaEntrega)
@@ -635,10 +598,7 @@ public class DevPlus {
             return -1;
         }
 
-        int numeroInicio = convertirFechaANumero(listProyecto[index].getFechaInicio());
-        int numeroEntrega = convertirFechaANumero(listProyecto[index].getFechaEntrega());
-
-        return numeroEntrega - numeroInicio;
+        return listProyecto[index].calcularCantidadDias();
     }
 
     //Calcula la tarifa total de un desarrollador para una cantidad de dias trabajados
@@ -649,7 +609,7 @@ public class DevPlus {
             return -1;
         }
 
-        return listDesarrollador[index].getTarifaDia() * cantidadDias;
+        return Proyecto.calcularTarifaDesarrolladores(listDesarrollador[index], cantidadDias);
     }
 
     //Calcula el posible descuento de un cliente frecuente sobre un subtotal
@@ -660,13 +620,7 @@ public class DevPlus {
             return -1;
         }
 
-        double descuento = 0;
-
-        if (listCliente[index].isEsFrecuente()) {
-            descuento = subtotal * 0.1;
-        }
-
-        return descuento;
+        return Proyecto.calcularDescuentos(listCliente[index], subtotal);
     }
 
     //Calcula el valor total de un proyecto teniendo en cuenta tarifa de desarrolladores,
@@ -687,22 +641,18 @@ public class DevPlus {
             return -1;
         }
 
-        double valorServicios = calcularValorServiciosAdicionales(codigoProyecto);
-        double descuento = calcularDescuentoClienteFrecuente(proyecto.getCliente().getIdentificacion(), tarifaDesarrolladores + valorServicios);
+        double valorServicios = proyecto.calcularValorServiciosAdicionales();
+        double descuento = Proyecto.calcularDescuentos(proyecto.getCliente(), tarifaDesarrolladores + valorServicios);
 
-        double valorTotal = tarifaDesarrolladores + valorServicios - descuento;
-
-        proyecto.setValorTotalp(valorTotal);
-
-        return valorTotal;
+        return proyecto.calcularValorTotal(cantidadDias, valorServicios, descuento, tarifaDesarrolladores);
     }
 
     // Calcular el valor acumulado de los proyectos
     public void calcularIngresosAcumuladoProyectos() {
 
 
-        int fechaInicio = convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha inicial del periodo a revisar, con el formato (dd/mm/aaaa)"));
-        int fechaFin = convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha final del periodo a revisar, con el formato (dd/mm/aaaa)"));
+        int fechaInicio = Proyecto.convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha inicial del periodo a revisar, con el formato (dd/mm/aaaa)"));
+        int fechaFin = Proyecto.convertirFechaANumero(JOptionPane.showInputDialog("Ingrese la fecha final del periodo a revisar, con el formato (dd/mm/aaaa)"));
 
         if (fechaFin <= 0 || fechaInicio <= 0 ) {
             JOptionPane.showMessageDialog(null, "Fechas no validas, porfavor respete el formato (dd/mm/aaaa)");
@@ -714,9 +664,9 @@ public class DevPlus {
         for (int i = 0; i < listProyecto.length; i++) {
 
             if (listProyecto[i] != null) {
-                int fechaSoli = convertirFechaANumero(listProyecto[i].getFechaSolicitud());
+                int fechaSoli = Proyecto.convertirFechaANumero(listProyecto[i].getFechaSolicitud());
 
-                if (fechaInicio >= fechaSoli && fechaSoli <= fechaFin) {
+                if (fechaSoli >= fechaInicio && fechaSoli <= fechaFin) {
                     totalIngresos += listProyecto[i].getValorTotalp();
                     cantidadProyectos ++;
                 }
@@ -744,7 +694,7 @@ public class DevPlus {
 
         if (index != -1) {
             String cambioEstado = JOptionPane.showInputDialog(null, "Ingrese el nuevo estado del proyecto  (Pendiente, Confirmado, En curso, Finalizado, Cancelado)");
-            listProyecto[index].setEstado(cambioEstado);
+            listProyecto[index].cambiarEstadoProyecto(cambioEstado);
             mensaje = "El estado del Proyecto: " + listProyecto[index].getCodigo() + " fue cambiado exitosamente.";
         } else {
             mensaje = "El proyecto no se encuentra en la lista.";
@@ -756,7 +706,7 @@ public class DevPlus {
     public boolean agregarDesarrolladorProyecto(String codigoDesarrollador, String codigoProyecto) {
         boolean resultado = false;
         int indexProyecto = encontrarIndexProyectoPorCodigo(codigoProyecto);
-        int indexDesarrollador = encontrarIndexDesarrolLadorPorCodigo(codigoDesarrollador);
+        int indexDesarrollador = encontrarIndexDesarrolladorPorCodigo(codigoDesarrollador);
 
 
         if (indexProyecto == -1) {
@@ -771,23 +721,15 @@ public class DevPlus {
 
         // Validar disponibilidad segun las fechas del proyecto
         if (validarDisponibilidadDesarrollador(indexDesarrollador, codigoProyecto)) {
-            Desarrollador[] listaDesarrolladorProyecto = listProyecto[indexProyecto].getListDesarrolador();
+            resultado = listProyecto[indexProyecto].agregarDesarrollador(listDesarrollador[indexDesarrollador]);
 
-            for (int i = 0; i < listaDesarrolladorProyecto.length; i++) {
-                if (listaDesarrolladorProyecto[i] == null) {
-                    listaDesarrolladorProyecto[i] = listDesarrollador[indexDesarrollador];
-                    resultado = true;
-                    String estadoProyecto = listProyecto[indexProyecto].getEstado();
-                    // Solo se marca Ocupado si el proyecto ya esta Confirmado
-                    if (estadoProyecto.equalsIgnoreCase("Confirmado")) {
-                        actualizarEstadoDesarroladorPorProyecto(indexDesarrollador,estadoProyecto);
-                    }
-
-                    break;
+            if (resultado) {
+                String estadoProyecto = listProyecto[indexProyecto].getEstado();
+                // Solo se marca Ocupado si el proyecto ya esta Confirmado
+                if (estadoProyecto.equalsIgnoreCase("Confirmado")) {
+                    actualizarEstadoDesarroladorPorProyecto(indexDesarrollador);
                 }
-            }
-
-            if (!resultado) {
+            } else {
                 JOptionPane.showMessageDialog(null, "El proyecto ya tiene el cupo máximo de desarrolladores.");
             }
         }
@@ -813,8 +755,6 @@ public class DevPlus {
 
         Desarrollador desarrollador = listDesarrollador[indexDesarrollador];
         Proyecto proyectoSolicitado = listProyecto[indexProyectoSolicitado];
-        int inicioSolicitado = convertirFechaANumero(proyectoSolicitado.getFechaInicio());
-        int entregaSolicitado = convertirFechaANumero(proyectoSolicitado.getFechaEntrega());
 
         for (int i = 0; i < listProyecto.length; i++) {
             if (listProyecto[i] != null && listProyecto[i] != proyectoSolicitado) {
@@ -822,12 +762,10 @@ public class DevPlus {
 
                 for (int j = 0; j < desarrolladoresProyecto.length; j++) {
                     if (desarrolladoresProyecto[j] == desarrollador) {
-                        int inicioExistente = convertirFechaANumero(listProyecto[i].getFechaInicio());
-                        int entregaExistente = convertirFechaANumero(listProyecto[i].getFechaEntrega());
+                        boolean estaDisponible = listProyecto[i].validarDisponibilidad(
+                                proyectoSolicitado.getFechaInicio(), proyectoSolicitado.getFechaEntrega());
 
-                        boolean seCruzanLasFechas = inicioSolicitado <= entregaExistente && inicioExistente <= entregaSolicitado;
-
-                        if (seCruzanLasFechas) {
+                        if (!estaDisponible) {
                             JOptionPane.showMessageDialog(null, "El desarrollador no está disponible en las fechas solicitadas.");
                             return false;
                         }
@@ -840,22 +778,9 @@ public class DevPlus {
         return true;
     }
 
-    public int encontrarIndexDesarrolLadorPorCodigo(String codigoBuscar) {
-        for (int i = 0; i < listDesarrollador.length; i++) {
-            if (listDesarrollador[i] != null && listDesarrollador[i].getCodigo().equals(codigoBuscar)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public void actualizarEstadoDesarroladorPorProyecto(int codigoDesarrollador, String estadoProyecto) {
-            String cambioEstado = "Ocupado";
-            if (estadoProyecto.equals("(Pendiente")){
-                cambioEstado = "Asignado";
-            }
-            listDesarrollador[codigoDesarrollador].setEstado(cambioEstado);
-            JOptionPane.showMessageDialog(null, "El desarrollador "+ listDesarrollador[codigoDesarrollador].getCodigo() + " fue asiganado a un proyecto.");
+    public void actualizarEstadoDesarroladorPorProyecto(int codigoDesarrollador) {
+            String mensaje = listDesarrollador[codigoDesarrollador].cambiarEstadoDesarrollador("Ocupado");
+            JOptionPane.showMessageDialog(null, mensaje);
     }
 
 }

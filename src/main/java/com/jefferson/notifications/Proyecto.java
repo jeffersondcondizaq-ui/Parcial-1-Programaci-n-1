@@ -107,4 +107,111 @@ public class Proyecto {
     public void setListServicioAdicional(ServicioAdicional[] listServicioAdicional) {
         this.listServicioAdicional = listServicioAdicional;
     }
+
+    //Cambia el estado del proyecto
+    public void cambiarEstadoProyecto(String nuevoEstado) {
+        this.estado = nuevoEstado;
+    }
+
+    //Agrega un desarrollador a este proyecto
+    public boolean agregarDesarrollador(Desarrollador desarrollador) {
+        for (int i = 0; i < listDesarrolador.length; i++) {
+            if (listDesarrolador[i] == null) {
+                listDesarrolador[i] = desarrollador;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Agrega un servicio adicional a este proyecto
+    public boolean agregarServicioAdicional(ServicioAdicional servicio) {
+        for (int i = 0; i < listServicioAdicional.length; i++) {
+            if (listServicioAdicional[i] == null) {
+                listServicioAdicional[i] = servicio;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //Suma el precio de los servicios adicionales agregados a este proyecto
+    public double calcularValorServiciosAdicionales() {
+        double valorServicios = 0;
+
+        for (int i = 0; i < listServicioAdicional.length; i++) {
+            if (listServicioAdicional[i] != null) {
+                valorServicios += listServicioAdicional[i].getPrecio();
+            }
+        }
+
+        return valorServicios;
+    }
+
+    //Convierte una fecha dd/mm/aaaa en un numero para poder restar fechas de forma basica
+    static int convertirFechaANumero(String fecha) {
+        String[] partesFecha = {"","",""};
+        int indice = 0;
+
+        for (int i = 0; i < fecha.length() ; i++) {
+            if(fecha.charAt(i) == '/'){
+                indice ++;
+            }else {
+                partesFecha[indice] += fecha.charAt(i);
+            }
+        }
+        int dia = Integer.parseInt(partesFecha[0]);
+        int mes = Integer.parseInt(partesFecha[1]);
+        int anio = Integer.parseInt(partesFecha[2]);
+
+        return (anio * 360) + (mes * 30) + dia;
+    }
+
+    //Valida si este proyecto esta disponible (no se cruza) frente a otro rango de fechas
+    public boolean validarDisponibilidad(String otraFechaInicio, String otraFechaEntrega) {
+        int inicioEste = convertirFechaANumero(this.fechaInicio);
+        int entregaEste = convertirFechaANumero(this.fechaEntrega);
+        int inicioOtro = convertirFechaANumero(otraFechaInicio);
+        int entregaOtro = convertirFechaANumero(otraFechaEntrega);
+
+        boolean seCruzanLasFechas = inicioOtro <= entregaEste && inicioEste <= entregaOtro;
+
+        return !seCruzanLasFechas;
+    }
+
+    //Calcula la cantidad de dias de desarrollo de este proyecto (fechaInicio - fechaEntrega)
+    public int calcularCantidadDias() {
+        int numeroInicio = convertirFechaANumero(this.fechaInicio);
+        int numeroEntrega = convertirFechaANumero(this.fechaEntrega);
+
+        return numeroEntrega - numeroInicio;
+    }
+
+    //Calcula la tarifa total de un desarrollador para una cantidad de dias trabajados
+    public static double calcularTarifaDesarrolladores(Desarrollador desarrollador, int cantidadDias) {
+        return desarrollador.getTarifaDia() * cantidadDias;
+    }
+
+    //Calcula el posible descuento de un cliente frecuente sobre un subtotal
+    public static double calcularDescuentos(Cliente cliente, double subtotal) {
+        double descuento = 0;
+
+        if (cliente.isEsFrecuente()) {
+            descuento = subtotal * 0.1;
+        }
+
+        return descuento;
+    }
+
+    //Calcula el valor total del proyecto teniendo en cuenta tarifa de desarrolladores,
+    //dias de desarrollo, servicios adicionales y descuentos de clientes frecuentes
+    public double calcularValorTotal(int totalDias, double totalServicios, double descuentos, double tarifaDesarrolladores) {
+        double valorTotal = tarifaDesarrolladores + totalServicios - descuentos;
+
+        this.valorTotalp = valorTotal;
+
+        return valorTotal;
+    }
 }

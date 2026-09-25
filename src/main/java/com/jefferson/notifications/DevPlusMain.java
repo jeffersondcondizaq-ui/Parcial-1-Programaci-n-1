@@ -108,8 +108,8 @@ public class DevPlusMain {
                                 "Seleccione una opcion\n" +
                                 "\n 1. Registrar Proyecto" +
                                 "\n 2. Mostrar Proyectos" +
-                                "\n 4. Mostrar Proyecto por Codigo" +
-                                "\n 5. Actualizar Proyecto" +
+                                "\n 3. Mostrar Proyecto por Codigo" +
+                                "\n 4. Actualizar Proyecto" +
                                 "\n 5. Eliminar Proyecto" +
                                 "\n 6. Calcular Valor Total del Proyecto" +
                                 "\n 7. Agregar Servicio Adicional a Proyecto" +

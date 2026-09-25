@@ -76,4 +76,15 @@ public class Cliente {
     public void setListProyecto(Proyecto[] listProyecto) {
         this.listProyecto = listProyecto;
     }
+
+    //Busca un cliente dentro de una lista de clientes a partir de su telefono
+    public static Cliente buscarClientePorTelefono(Cliente[] listaClientes, String telefonoBuscar) {
+        for (int i = 0; i < listaClientes.length; i++) {
+            if (listaClientes[i] != null && listaClientes[i].getTelefono().equals(telefonoBuscar)) {
+                return listaClientes[i];
+            }
+        }
+
+        return null;
+    }
 }

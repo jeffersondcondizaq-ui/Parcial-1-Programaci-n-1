@@ -68,4 +68,10 @@ public class Desarrollador {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+
+    //Cambia el estado del desarrollador y devuelve un mensaje de confirmacion
+    public String cambiarEstadoDesarrollador(String nuevoEstado) {
+        this.estado = nuevoEstado;
+        return "El desarrollador " + this.codigo + " fue asiganado a un proyecto.";
+    }
 }
